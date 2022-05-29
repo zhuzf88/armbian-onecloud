@@ -70,6 +70,22 @@ bootm 0x20800000 0x22000000 0x21800000
 
 ## 已知bug
 
+### 编译错误
+
+```
+cache/toolchain/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/../lib/gcc/arm-linux-gnueabihf/8.3.0/plugin/include/builtins.h:23:10: fatal error: mpc.h: No such file or directory
+make[2]: *** [scripts/gcc-plugins/Makefile:47: scripts/gcc-plugins/arm_ssp_per_task_plugin.so] Error 1
+make[1]: *** [scripts/Makefile.build:496: scripts/gcc-plugins] Error 2
+make: *** [Makefile:1197: scripts] Error 2
+[ error ] ERROR in function compile_kernel [ main.sh:588 -> main.sh:489 -> compilation.sh:507 -> general.sh:0 ]
+```
+
+安装libmpc-dev
+
+```
+apt install libmpc-dev
+```
+
 ### 靠近`HDMI`的`USB`不可用
 
 由于我自己需要使用[USB Gadget](https://www.kernel.org/doc/html/latest/driver-api/usb/gadget.html)，因此我把`USB0`的模式设置成了`otg`。具体见`dts`(由 `patch/kernel/archive/meson-{5.10,5.18}/support-xunlei-onecloud.patch` 添加)中的 `&usb0/dr_mode` 。
