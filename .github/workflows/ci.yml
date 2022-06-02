@@ -3,6 +3,10 @@ name: CI
 on:
   workflow_dispatch:
   push:
+    branches:
+      - readme
+    paths:
+      - .github/workflows/ci.yml
 
 jobs:
   build:
