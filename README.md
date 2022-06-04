@@ -1,7 +1,17 @@
 # armbian-onecloud
 [README](README.md) | [中文文档](README_zh.md)
 
-**Except `bootscript` all changes were push to [the official repository](https://github.com/armbian/build).**
+**Except `bootscript` or `Fix USB` all changes were push to [the official repository](https://github.com/armbian/build).**
+
+## ❗❗❗ Need feedback ❗❗❗
+
+Please try [test-usb-ci-20220603-2028](https://github.com/hzyitc/armbian-onecloud/releases/tag/test-usb-ci-20220603-2028) and [test-usb-ci-20220603-2029](https://github.com/hzyitc/armbian-onecloud/releases/tag/test-usb-ci-20220603-2029) to check whether `USB` closed to the `HDMI` working.
+
+For `V1.0 board`, ***both of them*** should work.
+
+For `V1.3 board`, ***only the second one*** should work.
+
+Please feedback to [Issue #5](https://github.com/hzyitc/armbian-onecloud/issues/5).
 
 ## Build Parameters
 
@@ -88,16 +98,18 @@ apt install libmpc-dev
 
 ### The `USB` closed to the `HDMI` doesn't work
 
+Fix in [branch usb](https://github.com/hzyitc/armbian-onecloud/tree/usb), but **need to be tested**. See [❗❗❗ Need feedback ❗❗❗](#-need-feedback-).
+
+***NOTE: Not contribute to [the official repository](https://github.com/armbian/build) yet.***
+
+#### Why?
+
 The mode of `USB0` was set to `otg` due to my need for [USB Gadget](https://www.kernel.org/doc/html/latest/driver-api/usb/gadget.html). Check the `&usb0/dr_mode` in the `dts` (added by `patch/kernel/archive/meson-{5.10,5.18}/support-xunlei-onecloud.patch`).
 
 In early test, I notice that the `USB Slave` can be detected. So I contributed to [the official repository](https://github.com/armbian/build) directly. But it doesn't working now.
 
-For `V1.0 board`, you can set the `dr_mode` of `usb0` to `host` in `dts` to fix it.
+For `V1.3 board`, probably due to not connecting `VBUS` to `SoC`, the `ACA` check will fail. So the `USB0` will be disabled.
 
-But it didn't work for ***my*** `V1.3 board`, I'm not sure whether it's just a exception. (**Welcome to report**). The `dmesg` also notice that the `USB` power up failed.
+#### Why not contribute to [the official repository](https://github.com/armbian/build) yet ?
 
-In the later Linux, `usb-role-switch` can be used to allow the system to switch the `USB mode`, and `role-switch-default-mode` can be used to set the default mode.
-
-`hnp`, `srp`, `adp` and so on **may** alse be able to fix it.
-
-But only until the bug in `V1.3 board` was fixed, all these changes will be pushed together.
+I want to try to support `usb-role-switch` which allow the system to switch the `mode` of `USB` the `USB` closed to the `HDMI`.
