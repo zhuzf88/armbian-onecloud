@@ -21,11 +21,11 @@
 
 | BRANCH    | 内核版本                                                        | 启动  | 关机/重启 | eMMC | HDMI | VPU |
 | :-:       | :-:                                                            | :-:   | :-:      | :-:  | :-:  | :-: |
-| `edge`    | [xdarklight's](https://github.com/xdarklight/linux) `v5.18-rc` | √     | √        | √    | √    | √   |
-| `current` | `v5.14`                                                        | √     | √        | √    | ×    | ×   |
-| `legacy`  | `v5.11`                                                        | √     | √        | √    | ×    | ×   |
-|           | <=`v5.10`                                                      | √     | √        | ×    | ×    | ×   |
-|           | >=`v5.15`                                                      | 非常久 | ×        | √    | ×    | ×   |
+| `edge`    | [xdarklight's](https://github.com/xdarklight/linux) `v5.18-rc` | ✔️    | ✔️      | ✔️  | ✔️   | ✔️  |
+| `current` | `v5.14`                                                        | ✔️    | ✔️      | ✔️  | ❌   | ❌  |
+| `legacy`  | `v5.11`                                                        | ✔️    | ✔️      | ✔️  | ❌   | ❌  |
+|           | <=`v5.10`                                                      | ✔️    | ✔️      | ❌  | ❌   | ❌  |
+|           | >=`v5.15`                                                      | 非常久 | ❌      | ✔️  | ❌   | ❌  |
 
 ### `BUILD_DESKTOP`={`no`,`yes`}
 参见上表，仅在 `BRANCH=edge` 时有效

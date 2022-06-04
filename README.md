@@ -19,13 +19,13 @@ Please feedback to [Issue #5](https://github.com/hzyitc/armbian-onecloud/issues/
 
 ### `BRANCH`={`edge`,`current`,`legacy`}
 
-| BRANCH    | kernel version                                                 | Boot  | Shutdown/Reboot | eMMC | HDMI | VPU |
+| BRANCH    | kernel version                                                 | Boot             | Shutdown/Reboot | eMMC | HDMI | VPU |
 | :-:       | :-:                                                            | :-:              | :-:             | :-:  | :-:  | :-: |
-| `edge`    | [xdarklight's](https://github.com/xdarklight/linux) `v5.18-rc` | √                | √               | √    | √    | √   |
-| `current` | `v5.14`                                                        | √                | √               | √    | ×    | ×   |
-| `legacy`  | `v5.11`                                                        | √                | √               | √    | ×    | ×   |
-|           | <=`v5.10`                                                      | √                | √               | ×    | ×    | ×   |
-|           | >=`v5.15`                                                      | Take a long time | ×               | √    | ×    | ×   |
+| `edge`    | [xdarklight's](https://github.com/xdarklight/linux) `v5.18-rc` | ✔️               | ✔️             | ✔️   | ✔️  | ✔️ |
+| `current` | `v5.14`                                                        | ✔️               | ✔️             | ✔️   | ❌  | ❌ |
+| `legacy`  | `v5.11`                                                        | ✔️               | ✔️             | ✔️   | ❌  | ❌ |
+|           | <=`v5.10`                                                      | ✔️               | ✔️             | ❌   | ❌  | ❌ |
+|           | >=`v5.15`                                                      | Take a long time | ❌             | ✔️   | ❌   | ❌ |
 
 ### `BUILD_DESKTOP`={`no`,`yes`}
 See above. Only work with `BRANCH=edge`
