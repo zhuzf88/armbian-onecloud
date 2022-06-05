@@ -84,12 +84,26 @@ jobs:
         with:
           path: artifacts/
 
+      - name: Generate sha256sum
+        run: |
+          touch sha256sum
+          for a in artifacts/*/*.sha; do
+            cat "$a" >>sha256sum
+            rm -f "$a"
+          done
+
+      - name: Show sha256sum
+        run: |
+          cat sha256sum
+
       - name: Release
         run: |
           time="${{ github.event.head_commit.timestamp }}"
           sha="${GITHUB_SHA:0:8}"
           tag="ci-$(date +'%Y%m%d-%H%M' -d "$time")"
           message="CI $(date +'%Y-%m-%d %H:%M' -d "$time")"
-          hub release create $(for a in artifacts/*/*; do echo -a $a; done) -t "$GITHUB_SHA" "$tag" -m "$message"
+          hub release create  -t "$GITHUB_SHA" "$tag" -m "$message" \
+            $(for a in artifacts/*/*; do echo -a $a; done) \
+            -a sha256sum
         env:
           GITHUB_TOKEN: ${{ github.token }}
