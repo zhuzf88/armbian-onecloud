@@ -64,7 +64,7 @@ jobs:
             DESKTOP_APPGROUPS_SELECTED=${{ matrix.DESKTOP_APPGROUPS_SELECTED }} \
             EXPERT=yes \
             USE_CCACHE=no \
-            COMPRESS_OUTPUTIMAGE=gz,sha,gpg
+            COMPRESS_OUTPUTIMAGE=xz,sha,gpg
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
