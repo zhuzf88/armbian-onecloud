@@ -44,11 +44,6 @@ jobs:
         with:
           ref: onecloud-fix-bugs
 
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install libmpc-dev
-
       - name: Build
         run: |
           sudo ./compile.sh \
