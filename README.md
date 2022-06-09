@@ -1,17 +1,7 @@
 # armbian-onecloud
 [README](README.md) | [中文文档](README_zh.md)
 
-**Except `bootscript` or `Fix USB` all changes were push to [the official repository](https://github.com/armbian/build).**
-
-## ❗❗❗ Need feedback ❗❗❗
-
-Please try [test-usb-ci-20220603-2028](https://github.com/hzyitc/armbian-onecloud/releases/tag/test-usb-ci-20220603-2028) and [test-usb-ci-20220603-2029](https://github.com/hzyitc/armbian-onecloud/releases/tag/test-usb-ci-20220603-2029) to check whether `USB` closed to the `HDMI` working.
-
-For `V1.0 board`, ***both of them*** should work.
-
-For `V1.3 board`, ***only the second one*** should work.
-
-Please feedback to [Issue #5](https://github.com/hzyitc/armbian-onecloud/issues/5).
+**Has made a [PR](https://github.com/armbian/build/pull/3873) to [the official repository](https://github.com/armbian/build), wait for merging**
 
 ## Build Parameters
 
@@ -32,7 +22,24 @@ See above. Only work with `BRANCH=edge`
 
 ## Bootscript
 
-### Boot from `USB`
+### Boot from `USB` (***New, waiting for merging***)
+
+```
+bootdev="usb 0"
+rootdev="/dev/sda2"
+usb start
+fatload ${bootdev} 0x20800000 boot.scr && autoscr 0x20800000
+```
+
+### Boot from `eMMC` (***New, waiting for merging***)
+
+```
+bootdev="mmc 1"
+rootdev="/dev/mmcblk1p2"
+fatload ${bootdev} 0x20800000 boot.scr && autoscr 0x20800000
+```
+
+### Boot from `USB` (Old)
 
 ```
 setenv bootargs "root=/dev/sda2 rootwait rw console=ttyAML0,115200n8 no_console_suspend consoleblank=0"
@@ -46,7 +53,7 @@ fdt addr 21800000
 bootm 0x20800000 0x22000000 0x21800000
 ```
 
-### Boot from `eMMC`
+### Boot from `eMMC` (Old)
 
 ```
 setenv bootargs "root=/dev/mmcblk1p2 rootwait rw console=ttyAML0,115200n8 no_console_suspend consoleblank=0"
@@ -80,7 +87,7 @@ NOTE: These pins were found in `V1.0 board`. Those in `V1.3 board` was not confi
 
 ## Known bug
 
-### Compile error
+### Compile error (***Fixed, waiting for merging***)
 
 ```
 cache/toolchain/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf/bin/../lib/gcc/arm-linux-gnueabihf/8.3.0/plugin/include/builtins.h:23:10: fatal error: mpc.h: No such file or directory
@@ -96,20 +103,10 @@ Install libmpc-dev
 apt install libmpc-dev
 ```
 
-### The `USB` closed to the `HDMI` doesn't work
-
-Fix in [branch usb](https://github.com/hzyitc/armbian-onecloud/tree/usb), but **need to be tested**. See [❗❗❗ Need feedback ❗❗❗](#-need-feedback-).
-
-***NOTE: Not contribute to [the official repository](https://github.com/armbian/build) yet.***
-
-#### Why?
+### The `USB` closed to the `HDMI` doesn't work (***Fixed, waiting for merging***)
 
 The mode of `USB0` was set to `otg` due to my need for [USB Gadget](https://www.kernel.org/doc/html/latest/driver-api/usb/gadget.html). Check the `&usb0/dr_mode` in the `dts` (added by `patch/kernel/archive/meson-{5.10,5.18}/support-xunlei-onecloud.patch`).
 
 In early test, I notice that the `USB Slave` can be detected. So I contributed to [the official repository](https://github.com/armbian/build) directly. But it doesn't working now.
 
 For `V1.3 board`, probably due to not connecting `VBUS` to `SoC`, the `ACA` check will fail. So the `USB0` will be disabled.
-
-#### Why not contribute to [the official repository](https://github.com/armbian/build) yet ?
-
-I want to try to support `usb-role-switch` which allow the system to switch the `mode` of `USB` the `USB` closed to the `HDMI`.
