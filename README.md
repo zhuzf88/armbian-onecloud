@@ -20,7 +20,7 @@
 ### `BUILD_DESKTOP`={`no`,`yes`}
 See above. Only work with `BRANCH=edge`
 
-## Bootscript
+## How to boot from `u-boot` ?
 
 ### Boot from `USB`
 
