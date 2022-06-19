@@ -48,3 +48,9 @@ In the board, there is a missing 44-pins chip (WiFi module possibly) which has l
 Please check the `dts` (added by `patch/kernel/archive/meson-{5.10,5.18}/support-xunlei-onecloud.patch`) for more details.
 
 NOTE: These pins were found in `V1.0 board`. Those in `V1.3 board` was not confirmed yet.
+
+## Known bug
+
+### `V1.0 board` boots fail
+
+Probably due to the power, `CPU` doesn't work well in `1.5GHz`. So the boot fails.

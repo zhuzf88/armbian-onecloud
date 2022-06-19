@@ -49,3 +49,9 @@ fatload ${bootdev} 0x20800000 boot.scr && autoscr 0x20800000
 具体定义参见`dts`(由 `patch/kernel/archive/meson-{5.10,5.18}/support-xunlei-onecloud.patch` 添加)
 
 注：`dts`中的引脚是在`V1.0的板子`上测量出来的，未在`V1.3的板子`上面验证。
+
+## 已知bug
+
+### `V1.0板子`启动失败
+
+可能是供电的原因，`CPU` 在 `1.5GHz` 时工作不稳定，故导致启动失败。
