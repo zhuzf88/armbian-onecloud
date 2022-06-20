@@ -5,6 +5,14 @@
 
 **All changes were push to [the official repository](https://github.com/armbian/build).**
 
+## Known bug
+
+### `V1.0 board` boots fail or work abnormally
+
+In V1.3 board vcc_core is 1.1V, but in V1.0 board it's 1.0V. So CPU doesn't work well in 1.5GHz and the boot fails.
+
+***Fixed in [branch fix-v1.0-temportally](https://github.com/hzyitc/armbian-onecloud/tree/fix-v1.0-temportally) temportally.***
+
 ## Build Parameters
 
 ### `BOARD`=`onecloud`
@@ -48,9 +56,3 @@ In the board, there is a missing 44-pins chip (WiFi module possibly) which has l
 Please check the `dts` (added by `patch/kernel/archive/meson-{5.10,5.18}/support-xunlei-onecloud.patch`) for more details.
 
 NOTE: These pins were found in `V1.0 board`. Those in `V1.3 board` was not confirmed yet.
-
-## Known bug
-
-### `V1.0 board` boots fail
-
-Probably due to the power, `CPU` doesn't work well in `1.5GHz`. So the boot fails.

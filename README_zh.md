@@ -6,6 +6,14 @@
 
 **所有修改均已提交至[官方仓库](https://github.com/armbian/build)，您可以直接使用[官方仓库](https://github.com/armbian/build)进行编译。**
 
+## 已知bug
+
+### `V1.0板子` 启动失败或工作异常
+
+在 V1.3板子 上 vcc_core 是 1.1V，但在 V1.0板子 上 vcc_core 是 1.0V。所以 CPU 在 1.5GHz 时工作不稳定，故导致启动失败。
+
+***在 [fix-v1.0-temportally分支](https://github.com/hzyitc/armbian-onecloud/tree/fix-v1.0-temportally) 临时修复.***
+
 ## 编译参数
 
 ### `BOARD`=`onecloud`
@@ -49,9 +57,3 @@ fatload ${bootdev} 0x20800000 boot.scr && autoscr 0x20800000
 具体定义参见`dts`(由 `patch/kernel/archive/meson-{5.10,5.18}/support-xunlei-onecloud.patch` 添加)
 
 注：`dts`中的引脚是在`V1.0的板子`上测量出来的，未在`V1.3的板子`上面验证。
-
-## 已知bug
-
-### `V1.0板子`启动失败
-
-可能是供电的原因，`CPU` 在 `1.5GHz` 时工作不稳定，故导致启动失败。
