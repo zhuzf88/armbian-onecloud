@@ -42,7 +42,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          repository: armbian/build
+          ref: fix-v1.0-temportally
 
       - name: Build
         run: |
@@ -95,8 +95,8 @@ jobs:
         run: |
           time="${{ github.event.head_commit.timestamp }}"
           sha="${GITHUB_SHA:0:8}"
-          tag="ci-$(date +'%Y%m%d-%H%M' -d "$time")"
-          message="CI $(date +'%Y-%m-%d %H:%M' -d "$time")"
+          tag="fix-v1.0-temportally-ci-$(date +'%Y%m%d-%H%M' -d "$time")"
+          message="Fix-v1.0-temportally-CI $(date +'%Y-%m-%d %H:%M' -d "$time")"
           hub release create  -t "$GITHUB_SHA" "$tag" -m "$message" \
             $(for a in artifacts/*/*; do echo -a $a; done) \
             -a sha256sum
