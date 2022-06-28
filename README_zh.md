@@ -8,11 +8,11 @@
 
 ## 已知bug
 
-### `V1.0板子` 启动失败或工作异常
+### 错误的 `VCC_CORE` 导致启动失败或工作不稳定
 
-在 V1.3板子 上 vcc_core 是 1.1V，但在 V1.0板子 上 vcc_core 是 1.0V。所以 CPU 在 1.5GHz 时工作不稳定，故导致启动失败。
+板子使用 `PWM_D` 来调节 `VCC_CORE`。 但我们没有驱动它。
 
-***在 [fix-v1.0-temportally分支](https://github.com/hzyitc/armbian-onecloud/tree/fix-v1.0-temportally) 临时修复.***
+***在 [fix-vcc_core-temportally分支](https://github.com/hzyitc/armbian-onecloud/tree/fix-vcc_core-temportally) 临时修复.***
 
 ## 编译参数
 

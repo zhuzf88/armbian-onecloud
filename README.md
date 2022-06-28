@@ -7,11 +7,11 @@
 
 ## Known bug
 
-### `V1.0 board` boots fail or work abnormally
+### Incorrent `VCC_CORE` cause boots fail or work unstably
 
-In V1.3 board vcc_core is 1.1V, but in V1.0 board it's 1.0V. So CPU doesn't work well in 1.5GHz and the boot fails.
+The board use `PWM_D` to adjust `VCC_CORE`. But we don't driver it.
 
-***Fixed in [branch fix-v1.0-temportally](https://github.com/hzyitc/armbian-onecloud/tree/fix-v1.0-temportally) temportally.***
+***Fixed in [branch fix-vcc_core-temportally](https://github.com/hzyitc/armbian-onecloud/tree/fix-vcc_core-temportally) temportally.***
 
 ## Build Parameters
 
