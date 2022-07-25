@@ -5,14 +5,6 @@
 
 **All changes were push to [the official repository](https://github.com/armbian/build).**
 
-## Known bug
-
-### Incorrent `VCC_CORE` cause boots fail or work unstably
-
-The board use `PWM_D` to adjust `VCC_CORE`. But we don't driver it.
-
-***Fixed in [branch fix-vcc_core-temportally](https://github.com/hzyitc/armbian-onecloud/tree/fix-vcc_core-temportally) temportally.***
-
 ## Build Parameters
 
 ### `BOARD`=`onecloud`

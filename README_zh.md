@@ -6,14 +6,6 @@
 
 **所有修改均已提交至[官方仓库](https://github.com/armbian/build)，您可以直接使用[官方仓库](https://github.com/armbian/build)进行编译。**
 
-## 已知bug
-
-### 错误的 `VCC_CORE` 导致启动失败或工作不稳定
-
-板子使用 `PWM_D` 来调节 `VCC_CORE`。 但我们没有驱动它。
-
-***在 [fix-vcc_core-temportally分支](https://github.com/hzyitc/armbian-onecloud/tree/fix-vcc_core-temportally) 临时修复.***
-
 ## 编译参数
 
 ### `BOARD`=`onecloud`
