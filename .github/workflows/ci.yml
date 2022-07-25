@@ -42,7 +42,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: onecloud-fix-bugs
+          repository: armbian/build
 
       - name: Build
         run: |
@@ -96,8 +96,8 @@ jobs:
         run: |
           time="${{ github.event.head_commit.timestamp }}"
           sha="${GITHUB_SHA:0:8}"
-          tag="onecloud-fix-bugs-ci-$(date +'%Y%m%d-%H%M' -d "$time")"
-          message="onecloud-fix-bugs-CI $(date +'%Y-%m-%d %H:%M' -d "$time")"
+          tag="ci-$(date +'%Y%m%d-%H%M' -d "$time")"
+          message="CI $(date +'%Y-%m-%d %H:%M' -d "$time")"
           hub release create  -t "$GITHUB_SHA" "$tag" -m "$message" \
             $(for a in artifacts/*/*; do echo -a $a; done) \
             -a sha256sum
