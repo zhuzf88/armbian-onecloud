@@ -8,9 +8,71 @@ on:
     paths:
       - .github/workflows/ci.yml
 
+env:
+  SCRIPT_REPO: ${{ github.repository }}
+  SCRIPT_REF: ${{ github.ref_name }}
+  UBOOT_REPO: hzyitc/u-boot-onecloud
+  UBOOT_RELEASE: latest
+  UBOOT_BURNIMG: eMMC.burn.img
+  ARMBIAN_REPO: armbian/build
+  ARMBIAN_REF: master
+
 jobs:
+  prepare:
+    name: Prepare
+    runs-on: ubuntu-latest
+    outputs:
+      env: ${{ steps.get.outputs.env }}
+    steps:
+      - id: get
+        name: Get repositories information
+        run: |
+          TIME="$(curl https://api.github.com/repos/${SCRIPT_REPO}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
+
+          SCRIPT_SHA=$(curl https://api.github.com/repos/${SCRIPT_REPO}/commits/${SCRIPT_REF} | jq -r .sha)
+          UBOOT_TAG=$(curl https://api.github.com/repos/${UBOOT_REPO}/releases/${UBOOT_RELEASE} | jq -r .tag_name)
+          ARMBIAN_SHA=$(curl https://api.github.com/repos/${ARMBIAN_REPO}/commits/${ARMBIAN_REF} | jq -r .sha)
+
+          cat <<EOF | sed -E 's/^  //' >>$GITHUB_ENV
+            TIME=$TIME
+            SCRIPT_SHA=$SCRIPT_SHA
+            UBOOT_TAG=$UBOOT_TAG
+            ARMBIAN_SHA=$ARMBIAN_SHA
+          EOF
+          echo "::set-output name=env::$(cat $GITHUB_ENV | base64 -w 0)"
+
+      - name: Show repositories information
+        run: |
+          C_RESET="\e[0m"
+          C_BLACK="\e[30m"
+          C_RED="\e[31m"
+          C_GREEN="\e[32m"
+          C_YELLOW="\e[33m"
+          C_BLUE="\e[34m"
+          C_MAGENTA="\e[35m"
+          C_CYAN="\e[36m"
+          C_GRAY="\e[37m"
+
+          echo -e "$(cat <<EOF | sed -E 's/^  //'
+            TIME: ${C_GREEN}$(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')${C_RESET}
+            Script: ${C_BLUE}${SCRIPT_REPO}${C_RESET}@${C_YELLOW}${SCRIPT_SHA:0:8}${C_RESET}(https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA})
+            U-Boot: ${C_BLUE}${UBOOT_REPO}${C_RESET}@${C_MAGENTA}${UBOOT_TAG}${C_RESET}(https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_TAG})
+            Armbian: ${C_BLUE}${ARMBIAN_REPO}${C_RESET}@${C_YELLOW}${ARMBIAN_SHA:0:8}${C_RESET}(https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_SHA})
+          EOF
+          )"
+          
+          cat <<EOF | sed -E 's/^  //' >>$GITHUB_STEP_SUMMARY
+            # $(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')
+
+            ## Sources
+            Script: [${SCRIPT_REPO}@${SCRIPT_SHA:0:8}](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA})
+            U-Boot: [${UBOOT_REPO}@${UBOOT_TAG}](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_TAG})
+            Armbian: [${ARMBIAN_REPO}@${ARMBIAN_SHA:0:8}](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_SHA})
+          EOF
+
   build:
     name: Build ${{ matrix.RELEASE }}-${{ matrix.BRANCH }}-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
+    needs: prepare
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -39,10 +101,15 @@ jobs:
             DESKTOP_APPGROUPS_SELECTED: ""
 
     steps:
+      - name: Import env
+        run: |
+          echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          repository: armbian/build
+          repository: ${{ env.ARMBIAN_REPO }}
+          ref: ${{ env.ARMBIAN_SHA }}
 
       - name: "Apply patch #3981"
         run: |
@@ -77,8 +144,7 @@ jobs:
       - name: Download and unpack the latest u-boot
         run: |
           echo "::group::Download"
-          tag=$(curl https://api.github.com/repos/hzyitc/u-boot-onecloud/releases/latest | jq -r .tag_name)
-          curl -L -o ./uboot.img https://github.com/hzyitc/u-boot-onecloud/releases/download/$tag/eMMC.burn.img
+          curl -L -o ./uboot.img https://github.com/${UBOOT_REPO}/releases/download/${UBOOT_TAG}/${UBOOT_BURNIMG}
           echo "::endgroup::"
 
           echo "::group::Unpack"
@@ -129,9 +195,13 @@ jobs:
           path: output/images/*
 
   release:
-    needs: build
+    needs: [ prepare, build ]
     runs-on: ubuntu-latest
     steps:
+      - name: Import env
+        run: |
+          echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -152,13 +222,27 @@ jobs:
         run: |
           cat sha256sum
 
+          cat <<EOF | sed -E 's/^  //' >>$GITHUB_STEP_SUMMARY
+            # SHA256
+            $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
+          EOF
+
       - name: Release
         run: |
-          time="${{ github.event.head_commit.timestamp }}"
-          sha="${GITHUB_SHA:0:8}"
-          tag="ci-$(date +'%Y%m%d-%H%M' -d "$time")"
-          message="CI $(date +'%Y-%m-%d %H:%M' -d "$time")"
-          hub release create  -t "$GITHUB_SHA" "$tag" -m "$message" \
+          cat <<EOF | sed -E 's/^  //' >Release.md
+            CI $(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')
+
+            # Source
+            Script: [${SCRIPT_REPO}@${SCRIPT_SHA:0:8}](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA})
+            U-Boot: [${UBOOT_REPO}@${UBOOT_TAG}](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_TAG})
+            Armbian: [${ARMBIAN_REPO}@${ARMBIAN_SHA:0:8}](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_SHA})
+
+            # SHA256
+            $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
+          EOF
+
+          tag="ci-$(date -d "$TIME" -u +'%Y%m%d-%H%M%S-%Z')"
+          hub release create  -t "$GITHUB_SHA" "$tag" -F Release.md \
             $(for a in artifacts/*/*; do echo -a $a; done) \
             -a sha256sum
         env:
