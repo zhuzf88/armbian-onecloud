@@ -5,6 +5,14 @@
 
 **All changes were push to [the official repository](https://github.com/armbian/build).**
 
+## First-login
+
+Hostname: `onecloud`
+
+Account:  `root`
+
+Password: `1234`
+
 ## Build Parameters
 
 ### `BOARD`=`onecloud`
