@@ -57,3 +57,11 @@ fatload ${bootdev} 0x20800000 boot.scr && autoscr 0x20800000
 具体定义参见`dts`(由 `patch/kernel/archive/meson-{5.10,5.18}/support-xunlei-onecloud.patch` 添加)
 
 注：`dts`中的引脚是在`V1.0的板子`上测量出来的，未在`V1.3的板子`上面验证。
+
+## 相关链接
+
+[`armbian/build`](https://github.com/armbian/build) - Armbian官方
+
+[`xdarklight/linux@meson-mx-integration-5.18-20220417`](https://github.com/xdarklight/linux/tree/meson-mx-integration-5.18-20220417) - `edge`内核
+
+[`S805_Datasheet V0.8 20150126.pdf`](https://dn.odroid.com/S805/Datasheet/S805_Datasheet%20V0.8%2020150126.pdf) - S805数据手册
