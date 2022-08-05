@@ -55,19 +55,22 @@ jobs:
 
           echo -e "$(cat <<EOF | sed -E 's/^  //'
             TIME: ${C_GREEN}$(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')${C_RESET}
-            Script: ${C_BLUE}${SCRIPT_REPO}${C_RESET}@${C_YELLOW}${SCRIPT_SHA:0:8}${C_RESET}(https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA})
-            U-Boot: ${C_BLUE}${UBOOT_REPO}${C_RESET}@${C_MAGENTA}${UBOOT_TAG}${C_RESET}(https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_TAG})
-            Armbian: ${C_BLUE}${ARMBIAN_REPO}${C_RESET}@${C_YELLOW}${ARMBIAN_SHA:0:8}${C_RESET}(https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_SHA})
+            Script: ${C_BLUE}${SCRIPT_REPO}${C_RESET}@${C_MAGENTA}${SCRIPT_REF}${C_RESET}(https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_REF})
+                    ${C_YELLOW}${SCRIPT_SHA}${C_RESET}(https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA})
+            U-Boot: ${C_BLUE}${UBOOT_REPO}${C_RESET}@${C_MAGENTA}${UBOOT_RELEASE}${C_RESET}(https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_RELEASE})
+                    ${C_MAGENTA}${UBOOT_TAG}${C_RESET}(https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_TAG})
+            Armbian: ${C_BLUE}${ARMBIAN_REPO}${C_RESET}@${C_MAGENTA}${ARMBIAN_REF}${C_RESET}(https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_REF})
+                     ${C_YELLOW}${ARMBIAN_SHA}${C_RESET}(https://github.com/${SCRIPT_REPO}/tree/${ARMBIAN_SHA})
           EOF
           )"
-          
+
           cat <<EOF | sed -E 's/^  //' >>$GITHUB_STEP_SUMMARY
             # $(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')
 
             ## Sources
-            Script: [${SCRIPT_REPO}@${SCRIPT_SHA:0:8}](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA})
-            U-Boot: [${UBOOT_REPO}@${UBOOT_TAG}](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_TAG})
-            Armbian: [${ARMBIAN_REPO}@${ARMBIAN_SHA:0:8}](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_SHA})
+            Script: [${SCRIPT_REPO}@${SCRIPT_REF}](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_REF}) ([\`${SCRIPT_SHA}\`](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA}))
+            U-Boot: [${UBOOT_REPO}@${UBOOT_RELEASE}](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_RELEASE}) ([\`${UBOOT_TAG}\`](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_TAG}))
+            Armbian: [${ARMBIAN_REPO}@${ARMBIAN_REF}](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_REF}) ([\`${ARMBIAN_SHA}\`](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_SHA}))
           EOF
 
   build:
@@ -232,10 +235,10 @@ jobs:
           cat <<EOF | sed -E 's/^  //' >Release.md
             CI $(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')
 
-            # Source
-            Script: [${SCRIPT_REPO}@${SCRIPT_SHA:0:8}](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA})
-            U-Boot: [${UBOOT_REPO}@${UBOOT_TAG}](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_TAG})
-            Armbian: [${ARMBIAN_REPO}@${ARMBIAN_SHA:0:8}](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_SHA})
+            # Sources
+            Script: [${SCRIPT_REPO}@${SCRIPT_REF}](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_REF}) ([\`${SCRIPT_SHA}\`](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA}))
+            U-Boot: [${UBOOT_REPO}@${UBOOT_RELEASE}](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_RELEASE}) ([\`${UBOOT_TAG}\`](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_TAG}))
+            Armbian: [${ARMBIAN_REPO}@${ARMBIAN_REF}](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_REF}) ([\`${ARMBIAN_SHA}\`](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_SHA}))
 
             # SHA256
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
