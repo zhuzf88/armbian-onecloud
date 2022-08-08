@@ -155,10 +155,10 @@ jobs:
           repository: ${{ env.ARMBIAN_REPO }}
           ref: ${{ env.ARMBIAN_SHA }}
 
-      - name: "Apply patch #3981 and #4050"
+      - name: "Apply patch #3981"
         run: |
-          curl -L -O "https://github.com/armbian/build/pull/{3981,4050}.patch"
-          git apply {3981,4050}.patch
+          curl -L -O https://github.com/armbian/build/pull/3981.patch
+          git apply 3981.patch
 
       - name: Download debs
         uses: actions/download-artifact@v2
