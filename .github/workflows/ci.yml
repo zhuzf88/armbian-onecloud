@@ -73,9 +73,50 @@ jobs:
             Armbian: [${ARMBIAN_REPO}@${ARMBIAN_REF}](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_REF}) ([\`${ARMBIAN_SHA}\`](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_SHA}))
           EOF
 
+  build-debs:
+    name: Build ${{ matrix.BRANCH }}
+    needs: prepare
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        BRANCH:
+          - edge
+          - current
+          - legacy
+
+    steps:
+      - name: Import env
+        run: |
+          echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ env.ARMBIAN_REPO }}
+          ref: ${{ env.ARMBIAN_SHA }}
+
+      - name: Build
+        run: |
+          sudo ./compile.sh \
+            BOARD=onecloud \
+            BRANCH=${{ matrix.BRANCH }} \
+            KERNEL_CONFIGURE=no \
+            KERNEL_ONLY=yes \
+            EXPERT=yes \
+            USE_CCACHE=no \
+            NO_APT_CACHER=yes
+          sudo chown $(id -u):$(id -g) -R output/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: debs-${{ matrix.BRANCH }}
+          path: output/debs/*
+
   build:
     name: Build ${{ matrix.RELEASE }}-${{ matrix.BRANCH }}-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
-    needs: prepare
+    needs: [ prepare, build-debs ]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -119,6 +160,12 @@ jobs:
           curl -L -O https://github.com/armbian/build/pull/3981.patch
           git apply 3981.patch
 
+      - name: Download debs
+        uses: actions/download-artifact@v2
+        with:
+          name: debs-${{ matrix.BRANCH }}
+          path: output/debs/
+
       - name: Build
         run: |
           sudo ./compile.sh \
@@ -133,6 +180,8 @@ jobs:
             DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ matrix.DESKTOP_ENVIRONMENT_CONFIG_NAME }} \
             DESKTOP_APPGROUPS_SELECTED=${{ matrix.DESKTOP_APPGROUPS_SELECTED }} \
             EXPERT=yes \
+            SKIP_EXTERNAL_TOOLCHAINS=yes \
+            CLEAN_LEVEL= \
             USE_CCACHE=no \
             NO_APT_CACHER=yes \
             COMPRESS_OUTPUTIMAGE=img,xz,sha,gpg
@@ -212,6 +261,10 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           path: artifacts/
+
+      - name: Remove debs
+        run: |
+          rm -rf artifacts/debs-*
 
       - name: Generate sha256sum
         run: |
