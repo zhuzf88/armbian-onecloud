@@ -35,8 +35,7 @@ See above. Only work with `BRANCH=edge`
 ### Boot from `USB`
 
 ```
-bootdev="usb 0"
-rootdev="/dev/sda2"
+setenv bootdev "usb 0"
 usb start
 fatload ${bootdev} 0x20800000 boot.scr && autoscr 0x20800000
 ```
@@ -44,8 +43,7 @@ fatload ${bootdev} 0x20800000 boot.scr && autoscr 0x20800000
 ### Boot from `eMMC`
 
 ```
-bootdev="mmc 1"
-rootdev="/dev/mmcblk1p2"
+setenv bootdev "mmc 1"
 fatload ${bootdev} 0x20800000 boot.scr && autoscr 0x20800000
 ```
 

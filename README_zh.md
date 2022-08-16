@@ -36,8 +36,7 @@
 ### 从`USB`启动
 
 ```
-bootdev="usb 0"
-rootdev="/dev/sda2"
+setenv bootdev "usb 0"
 usb start
 fatload ${bootdev} 0x20800000 boot.scr && autoscr 0x20800000
 ```
@@ -45,8 +44,7 @@ fatload ${bootdev} 0x20800000 boot.scr && autoscr 0x20800000
 ### 从`eMMC`启动
 
 ```
-bootdev="mmc 1"
-rootdev="/dev/mmcblk1p2"
+setenv bootdev "mmc 1"
 fatload ${bootdev} 0x20800000 boot.scr && autoscr 0x20800000
 ```
 
