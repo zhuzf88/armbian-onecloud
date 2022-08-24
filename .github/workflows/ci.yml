@@ -264,10 +264,6 @@ jobs:
         with:
           path: artifacts/
 
-      - name: Remove debs
-        run: |
-          rm -rf artifacts/debs-*
-
       - name: Generate sha256sum
         run: |
           touch sha256sum
@@ -301,7 +297,8 @@ jobs:
 
           tag="ci-$(date -d "$TIME" -u +'%Y%m%d-%H%M%S-%Z')"
           hub release create  -t "$GITHUB_SHA" "$tag" -F Release.md \
-            $(for a in artifacts/*/*; do echo -a $a; done) \
-            -a sha256sum
+            -a sha256sum \
+            $(for a in artifacts/*/Armbian_*; do echo -a $a; done) \
+            $(for a in artifacts/*/linux-{image,headers,dtb}-*; do echo -a $a; done)
         env:
           GITHUB_TOKEN: ${{ github.token }}
