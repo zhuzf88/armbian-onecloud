@@ -19,12 +19,13 @@ Password: `1234`
 
 ### `BRANCH`={`edge`,`current`,`legacy`}
 
-| BRANCH    | kernel version                                                                                          | eMMC | HDMI | VPU |
-| :-:       | :-:                                                                                                     | :-:  | :-:  | :-: |
-| `edge`    | [xdarklight's `v5.18-rc7`](https://github.com/xdarklight/linux/tree/meson-mx-integration-5.18-20220516) | ✔️¹  | ✔️  | ✔️ |
-| `current` | `v5.15`                                                                                                 | ✔️¹  | ❌  | ❌ |
-| `legacy`  | `v5.10`                                                                                                 | ✔️¹  | ❌  | ❌ |
+| BRANCH    | kernel version | eMMC | HDMI | VPU |
+| :-:       | :-:            | :-:  | :-:  | :-: |
+| `edge`    | `v5.18`        | ✔️¹  | ✔️² | ✔️² |
+| `current` | `v5.15`        | ✔️¹  | ❌  | ❌  |
+| `legacy`  | `v5.10`        | ✔️¹  | ❌  | ❌  |
 > ¹: Need a patch
+> ²: Use patch to support
 
 ### `BUILD_DESKTOP`={`no`,`yes`}
 See above. Only work with `BRANCH=edge`

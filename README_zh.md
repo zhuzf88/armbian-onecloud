@@ -20,12 +20,13 @@
 
 ### `BRANCH`={`edge`,`current`,`legacy`}
 
-| BRANCH    | 内核版本                                                                                                 | eMMC | HDMI | VPU |
-| :-:       | :-:                                                                                                     | :-:  | :-:  | :-: |
-| `edge`    | [xdarklight's `v5.18-rc7`](https://github.com/xdarklight/linux/tree/meson-mx-integration-5.18-20220516) | ✔️¹  | ✔️  | ✔️ |
-| `current` | `v5.15`                                                                                                 | ✔️¹  | ❌  | ❌ |
-| `legacy`  | `v5.10`                                                                                                 | ✔️¹  | ❌  | ❌ |
-> ¹: Need a patch
+| BRANCH    | 内核版本        | eMMC | HDMI | VPU |
+| :-:       | :-:            | :-:  | :-:  | :-: |
+| `edge`    | `v5.18`        | ✔️¹  | ✔️² | ✔️² |
+| `current` | `v5.15`        | ✔️¹  | ❌  | ❌  |
+| `legacy`  | `v5.10`        | ✔️¹  | ❌  | ❌  |
+> ¹: 需要补丁
+> ²: 通过补丁支持
 
 ### `BUILD_DESKTOP`={`no`,`yes`}
 参见上表，仅在 `BRANCH=edge` 时有效
