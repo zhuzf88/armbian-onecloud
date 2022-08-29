@@ -189,8 +189,10 @@ jobs:
             COMPRESS_OUTPUTIMAGE=img,xz,sha,gpg
           sudo chown $(id -u):$(id -g) -R output/
 
-      - name: Download AmlImg
+      - name: Install Dependents
         run: |
+          sudo apt install img2simg
+
           ver="v0.3.0"
           curl -L -o ./AmlImg https://github.com/hzyitc/AmlImg/releases/download/$ver/AmlImg_${ver}_linux_amd64
           chmod +x ./AmlImg
@@ -209,20 +211,20 @@ jobs:
         run: |
           diskimg=$(ls output/images/*.img)
           loop=$(sudo losetup --find --show --partscan $diskimg)
-          sudo dd if=${loop}p1 of=burn/boot.img
-          sudo dd if=${loop}p2 of=burn/rootfs.img
+          sudo img2simg ${loop}p1 burn/boot.simg
+          sudo img2simg ${loop}p2 burn/rootfs.simg
           sudo losetup -d $loop
           sudo chown $(id -u):$(id -g) -R burn/
 
       - name: Generate burn image
         run: |
-          echo -n "sha1sum $(sha1sum burn/boot.img | awk '{print $1}')" >burn/boot.VERIFY
-          echo -n "sha1sum $(sha1sum burn/rootfs.img | awk '{print $1}')" >burn/rootfs.VERIFY
+          echo -n "sha1sum $(sha1sum burn/boot.simg | awk '{print $1}')" >burn/boot.VERIFY
+          echo -n "sha1sum $(sha1sum burn/rootfs.simg | awk '{print $1}')" >burn/rootfs.VERIFY
 
           cat <<EOF >>burn/commands.txt
-          PARTITION:boot:normal:boot.img
+          PARTITION:boot:sparse:boot.simg
           VERIFY:boot:normal:boot.VERIFY
-          PARTITION:rootfs:normal:rootfs.img
+          PARTITION:rootfs:sparse:rootfs.simg
           VERIFY:rootfs:normal:rootfs.VERIFY
           EOF
 
