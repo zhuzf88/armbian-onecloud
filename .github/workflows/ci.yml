@@ -155,9 +155,9 @@ jobs:
           repository: ${{ env.ARMBIAN_REPO }}
           ref: ${{ env.ARMBIAN_SHA }}
 
-      - name: "Apply patch #3774, #4072 and #4077"
+      - name: "Apply patch #3774 and #4077"
         run: |
-          curl -L -O "https://github.com/armbian/build/pull/{3774,4072,4077}.patch"
+          curl -L -O "https://github.com/armbian/build/pull/{3774,4077}.patch"
           for file in *.patch; do
             patch --batch -p1 -N <"$file"
           done
