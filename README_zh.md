@@ -52,7 +52,7 @@ fatload ${bootdev} 0x20800000 boot.scr && autoscr 0x20800000
 
 板子上面有一个44脚的空焊盘(推测可能是WiFi模块)。上面有大量直连`SoC`的引脚，可用作`GPIO`。
 
-具体定义参见`dts`(由 `patch/kernel/archive/meson-{5.10,5.18}/support-xunlei-onecloud.patch` 添加)
+具体定义参见`dts`(由 `patch/kernel/meson-edge/board_onecloud/0001-add-dts.patch` 和 `patch/kernel/meson-{current,legacy}/board_onecloud/add-dts.patch` 添加)
 
 注：`dts`中的引脚是在`V1.0的板子`上测量出来的，未在`V1.3的板子`上面验证。
 
