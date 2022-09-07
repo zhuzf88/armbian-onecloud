@@ -62,6 +62,6 @@ fatload ${bootdev} 0x20800000 boot.scr && autoscr 0x20800000
 
 [`armbian/build`](https://github.com/armbian/build) - Armbian官方
 
-[`xdarklight/linux@meson-mx-integration-5.18-20220417`](https://github.com/xdarklight/linux/tree/meson-mx-integration-5.18-20220417) - `edge`内核
+[`xdarklight/linux@meson-mx-integration-5.18-20220516`](https://github.com/xdarklight/linux/commits/meson-mx-integration-5.18-20220516) - `HDMI`补丁源码
 
 [`S805_Datasheet V0.8 20150126.pdf`](https://dn.odroid.com/S805/Datasheet/S805_Datasheet%20V0.8%2020150126.pdf) - S805数据手册

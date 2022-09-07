@@ -61,6 +61,6 @@ NOTE: These pins were found in `V1.0 board`. Those in `V1.3 board` was not confi
 
 [`armbian/build`](https://github.com/armbian/build) - Armbian offical
 
-[`xdarklight/linux@meson-mx-integration-5.18-20220417`](https://github.com/xdarklight/linux/tree/meson-mx-integration-5.18-20220417) - `edge` kernel
+[`xdarklight/linux@meson-mx-integration-5.18-20220417`](https://github.com/xdarklight/linux/tree/meson-mx-integration-5.18-20220417) - the source of `HDMI` patch
 
 [`S805_Datasheet V0.8 20150126.pdf`](https://dn.odroid.com/S805/Datasheet/S805_Datasheet%20V0.8%2020150126.pdf) - S805 datasheet
