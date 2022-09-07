@@ -24,7 +24,9 @@ Password: `1234`
 | `edge`    | `v5.18`        | ✔️¹  | ✔️² | ✔️² |
 | `current` | `v5.15`        | ✔️¹  | ❌  | ❌  |
 | `legacy`  | `v5.10`        | ✔️¹  | ❌  | ❌  |
+
 > ¹: Need a patch
+>
 > ²: Use patch to support
 
 ### `BUILD_DESKTOP`={`no`,`yes`}
