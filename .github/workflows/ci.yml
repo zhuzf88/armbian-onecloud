@@ -133,11 +133,6 @@ jobs:
           - minimal
           - cli
           - desktop
-        exclude:
-          - BRANCH: current
-            TYPE: desktop
-          - BRANCH: legacy
-            TYPE: desktop
         include:
           - TYPE: desktop
             DESKTOP_ENVIRONMENT: xfce
