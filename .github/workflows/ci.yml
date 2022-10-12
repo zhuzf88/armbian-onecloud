@@ -126,9 +126,11 @@ jobs:
           - current
           - legacy
         RELEASE:
-          - focal # Ubuntu 20.04 LTS
+          # - focal # Ubuntu 20.04 LTS
           - jammy # Ubuntu 22.04 LTS
+          # - buster # Debian 10
           - bullseye # Debian 11
+          - sid # Debian unstable
         TYPE:
           - minimal
           - cli
