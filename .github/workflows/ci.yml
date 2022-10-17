@@ -152,9 +152,8 @@ jobs:
           repository: ${{ env.ARMBIAN_REPO }}
           ref: ${{ env.ARMBIAN_SHA }}
 
-      - name: "Apply patch #3774 and #4077"
+      - name: "Apply patch #4077"
         run: |
-          curl -L -O "https://raw.githubusercontent.com/hzyitc/armbian-onecloud/readme/3774.patch"
           curl -L -O "https://github.com/armbian/build/pull/4077.patch"
           for file in *.patch; do
             patch --batch -p1 -N <"$file"
