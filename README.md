@@ -21,7 +21,7 @@ Password: `1234`
 
 | BRANCH    | kernel version | eMMC | HDMI | VPU |
 | :-:       | :-:            | :-:  | :-:  | :-: |
-| `edge`    | `v5.19`        | ✔️¹  | ✔️² | ✔️² |
+| `edge`    | `v6.0`         | ✔️¹  | ✔️² | ✔️² |
 | `current` | `v5.15`        | ✔️¹  | ✔️² | ✔️² |
 | `legacy`  | `v5.10`        | ✔️¹  | ✔️² | ✔️² |
 
