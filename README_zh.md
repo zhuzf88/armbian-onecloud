@@ -30,9 +30,6 @@
 >
 > ²: 通过补丁支持
 
-### `BUILD_DESKTOP`={`no`,`yes`}
-参见上表，仅在 `BRANCH=edge` 时有效
-
 ## 如何从`u-boot`启动？
 
 ### 从`USB`启动

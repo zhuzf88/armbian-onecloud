@@ -29,9 +29,6 @@ Password: `1234`
 >
 > ²: Use patch to support
 
-### `BUILD_DESKTOP`={`no`,`yes`}
-See above. Only work with `BRANCH=edge`
-
 ## How to boot from `u-boot` ?
 
 ### Boot from `USB`
