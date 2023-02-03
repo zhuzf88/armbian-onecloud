@@ -56,7 +56,7 @@ fatload ${bootdev} 0x20800000 boot.scr && autoscr 0x20800000
 
 ## 相关链接
 
-[`armbian/build`](https://github.com/armbian/build) - Armbian官方
+[`armbian/build`](https://github.com/armbian/build) - Armbian官方仓库
 
 [`xdarklight/linux@meson-mx-integration-5.18-20220516`](https://github.com/xdarklight/linux/commits/meson-mx-integration-5.18-20220516) - `HDMI`补丁源码
 
