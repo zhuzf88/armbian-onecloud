@@ -14,8 +14,8 @@ env:
   UBOOT_REPO: hzyitc/u-boot-onecloud
   UBOOT_RELEASE: latest
   UBOOT_BURNIMG: eMMC.burn.img
-  ARMBIAN_REPO: hzyitc/armbian-onecloud
-  ARMBIAN_REF: meson-bump
+  ARMBIAN_REPO: armbian/build
+  ARMBIAN_REF: main
 
 jobs:
   prepare:
@@ -95,16 +95,24 @@ jobs:
           repository: ${{ env.ARMBIAN_REPO }}
           ref: ${{ env.ARMBIAN_SHA }}
 
+      - name: "Apply patch #4891, #4996, #4997 and #4077"
+        run: |
+          curl -L -O "https://github.com/armbian/build/pull/{4891,4996,4997,4077}.patch"
+          for file in *.patch; do
+            patch --batch -p1 -N <"$file"
+          done
+
       - name: Build
         run: |
-          sudo ./compile.sh \
-            BOARD=onecloud \
-            BRANCH=${{ matrix.BRANCH }} \
-            KERNEL_CONFIGURE=no \
-            KERNEL_ONLY=yes \
-            EXPERT=yes \
-            USE_CCACHE=no \
-            NO_APT_CACHER=yes
+          # Don't update remote cache
+          export GITHUB_ACTIONS=false
+          sudo --preserve-env \
+            ./compile.sh kernel \
+              ALLOW_ROOT=yes \
+              BOARD=onecloud \
+              BRANCH=${{ matrix.BRANCH }} \
+              EXPERT=yes \
+              USE_CCACHE=no
           sudo chown $(id -u):$(id -g) -R output/
 
       - name: Upload artifacts
@@ -150,9 +158,9 @@ jobs:
           repository: ${{ env.ARMBIAN_REPO }}
           ref: ${{ env.ARMBIAN_SHA }}
 
-      - name: "Apply patch #4077"
+      - name: "Apply patch #4891, #4996, #4997 and #4077"
         run: |
-          curl -L -O "https://github.com/armbian/build/pull/4077.patch"
+          curl -L -O "https://github.com/armbian/build/pull/{4891,4996,4997,4077}.patch"
           for file in *.patch; do
             patch --batch -p1 -N <"$file"
           done
@@ -165,23 +173,25 @@ jobs:
 
       - name: Build
         run: |
-          sudo ./compile.sh \
-            BOARD=onecloud \
-            BRANCH=${{ matrix.BRANCH }} \
-            RELEASE=${{ matrix.RELEASE }} \
-            KERNEL_CONFIGURE=no \
-            KERNEL_ONLY=no \
-            BUILD_MINIMAL=${{ matrix.TYPE == 'minimal' && 'yes' || 'no' }} \
-            BUILD_DESKTOP=${{ matrix.TYPE == 'desktop' && 'yes' || 'no' }} \
-            DESKTOP_ENVIRONMENT=${{ matrix.DESKTOP_ENVIRONMENT }} \
-            DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ matrix.DESKTOP_ENVIRONMENT_CONFIG_NAME }} \
-            DESKTOP_APPGROUPS_SELECTED=${{ matrix.DESKTOP_APPGROUPS_SELECTED }} \
-            EXPERT=yes \
-            SKIP_EXTERNAL_TOOLCHAINS=yes \
-            CLEAN_LEVEL= \
-            USE_CCACHE=no \
-            NO_APT_CACHER=yes \
-            COMPRESS_OUTPUTIMAGE=img,xz,sha,gpg
+          # Don't update remote cache
+          export GITHUB_ACTIONS=false
+          sudo --preserve-env \
+            ./compile.sh build \
+              ALLOW_ROOT=yes \
+              BOARD=onecloud \
+              BRANCH=${{ matrix.BRANCH }} \
+              RELEASE=${{ matrix.RELEASE }} \
+              KERNEL_CONFIGURE=no \
+              BUILD_MINIMAL=${{ matrix.TYPE == 'minimal' && 'yes' || 'no' }} \
+              BUILD_DESKTOP=${{ matrix.TYPE == 'desktop' && 'yes' || 'no' }} \
+              DESKTOP_ENVIRONMENT=${{ matrix.DESKTOP_ENVIRONMENT }} \
+              DESKTOP_ENVIRONMENT_CONFIG_NAME=${{ matrix.DESKTOP_ENVIRONMENT_CONFIG_NAME }} \
+              DESKTOP_APPGROUPS_SELECTED=${{ matrix.DESKTOP_APPGROUPS_SELECTED }} \
+              EXPERT=yes \
+              SKIP_EXTERNAL_TOOLCHAINS=yes \
+              CLEAN_LEVEL= \
+              USE_CCACHE=no \
+              COMPRESS_OUTPUTIMAGE=img
           sudo chown $(id -u):$(id -g) -R output/
 
       - name: Install Dependents
@@ -227,17 +237,12 @@ jobs:
           burnimg=${prefix}.burn.img
           ./AmlImg pack $burnimg burn/
 
-      - name: Hash and compress burn image
+      - name: Hash and compress images
         run: |
-          cd output/images/
-          burnimg=$(ls *.burn.img)
-          sha256sum $burnimg | tee ${burnimg}.sha
-
-          pixz -9 <$burnimg >${burnimg}.xz
-
-      - name: Clean original files
-        run: |
-          rm -rf output/images/*.img
+          for f in output/images/*.img; do
+            sha256sum "$f" >"${f}.sha"
+            pixz -t "$f"
+          done
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
