@@ -68,7 +68,7 @@ jobs:
           if [[ -n "${PATCHES}" ]]; then
             echo -e "\nPatches:"
             while read -r id; do
-              echo -e '${C_BLUE}armbian/build${C_RESET}#${C_MAGENTA}${id}${C_RESET}(http://github.com/armbian/build/pull/${id})'
+              echo -e "  ${C_BLUE}armbian/build${C_RESET}#${C_MAGENTA}${id}${C_RESET}(http://github.com/armbian/build/pull/${id})"
             done < <(echo -e "${PATCHES}" | tr ',' '\n')
           fi
 
