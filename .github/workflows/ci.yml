@@ -241,7 +241,7 @@ jobs:
         run: |
           for f in output/images/*.img; do
             sha256sum "$f" >"${f}.sha"
-            pixz -t "$f"
+            xz --threads=0 --compress "$f"
           done
 
       - name: Upload artifacts
