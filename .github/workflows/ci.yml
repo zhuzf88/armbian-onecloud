@@ -16,6 +16,7 @@ env:
   UBOOT_BURNIMG: eMMC.burn.img
   ARMBIAN_REPO: armbian/build
   ARMBIAN_REF: main
+  PATCHES: 4077
 
 jobs:
   prepare:
@@ -64,6 +65,13 @@ jobs:
           EOF
           )"
 
+          if [[ -n "${PATCHES}" ]]; then
+            echo -e "\nPatches:"
+            while read -r id; do
+              echo -e '${C_BLUE}armbian/build${C_RESET}#${C_MAGENTA}${id}${C_RESET}(http://github.com/armbian/build/pull/${id})'
+            done < <(echo -e "${PATCHES}" | tr ',' '\n')
+          fi
+
           cat <<EOF | sed -E 's/^  //' >>$GITHUB_STEP_SUMMARY
             # $(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')
 
@@ -71,6 +79,11 @@ jobs:
             Script: [${SCRIPT_REPO}@${SCRIPT_REF}](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_REF}) ([\`${SCRIPT_SHA}\`](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA}))
             U-Boot: [${UBOOT_REPO}@${UBOOT_RELEASE}](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_RELEASE}) ([\`${UBOOT_TAG}\`](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_TAG}))
             Armbian: [${ARMBIAN_REPO}@${ARMBIAN_REF}](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_REF}) ([\`${ARMBIAN_SHA}\`](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_SHA}))
+
+            ${PATCHES:+$(
+              echo "## Patches"
+              echo "${PATCHES}" | tr ',' '\n' | sed -E 's|(.*)|[armbian/build#\1](http://github.com/armbian/build/pull/\1)|'
+            )}
           EOF
 
   build-debs:
@@ -95,9 +108,10 @@ jobs:
           repository: ${{ env.ARMBIAN_REPO }}
           ref: ${{ env.ARMBIAN_SHA }}
 
-      - name: "Apply patch #4077"
+      - name: "Apply patch ${{ env.PATCHES }}"
+        if: ${{ env.PATCHES }}
         run: |
-          curl -L -O "https://github.com/armbian/build/pull/4077.patch"
+          curl -L -O "https://github.com/armbian/build/pull/{${PATCHES}}.patch"
           for file in *.patch; do
             patch --batch -p1 -N <"$file"
           done
@@ -158,9 +172,10 @@ jobs:
           repository: ${{ env.ARMBIAN_REPO }}
           ref: ${{ env.ARMBIAN_SHA }}
 
-      - name: "Apply patch #4077"
+      - name: "Apply patch ${{ env.PATCHES }}"
+        if: ${{ env.PATCHES }}
         run: |
-          curl -L -O "https://github.com/armbian/build/pull/4077.patch"
+          curl -L -O "https://github.com/armbian/build/pull/{${PATCHES}}.patch"
           for file in *.patch; do
             patch --batch -p1 -N <"$file"
           done
@@ -295,6 +310,11 @@ jobs:
             Script: [${SCRIPT_REPO}@${SCRIPT_REF}](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_REF}) ([\`${SCRIPT_SHA}\`](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA}))
             U-Boot: [${UBOOT_REPO}@${UBOOT_RELEASE}](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_RELEASE}) ([\`${UBOOT_TAG}\`](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_TAG}))
             Armbian: [${ARMBIAN_REPO}@${ARMBIAN_REF}](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_REF}) ([\`${ARMBIAN_SHA}\`](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_SHA}))
+
+            ${PATCHES:+$(
+              echo "# Patches"
+              echo "${PATCHES}" | tr ',' '\n' | sed -E 's|(.*)|[armbian/build#\1](http://github.com/armbian/build/pull/\1)|'
+            )}
 
             # SHA256
             $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
