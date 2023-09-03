@@ -111,9 +111,14 @@ jobs:
       - name: "Apply patch ${{ env.PATCHES }}"
         if: ${{ env.PATCHES }}
         run: |
+          echo "::group::Download"
           curl -L -O "https://github.com/armbian/build/pull/{${PATCHES}}.patch"
+          echo "::endgroup::"
+
           for file in *.patch; do
+            echo "::group::Applying $file"
             patch --batch -p1 -N <"$file"
+            echo "::endgroup::"
           done
 
       - name: Build
@@ -177,9 +182,14 @@ jobs:
       - name: "Apply patch ${{ env.PATCHES }}"
         if: ${{ env.PATCHES }}
         run: |
+          echo "::group::Download"
           curl -L -O "https://github.com/armbian/build/pull/{${PATCHES}}.patch"
+          echo "::endgroup::"
+
           for file in *.patch; do
+            echo "::group::Applying $file"
             patch --batch -p1 -N <"$file"
+            echo "::endgroup::"
           done
 
       - name: Download debs
