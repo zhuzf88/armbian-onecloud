@@ -19,6 +19,9 @@ env:
   PATCHES: 4077,5076
   PATCHES_DISABLED: 5082
 
+permissions:
+  contents: write
+
 jobs:
   prepare:
     name: Prepare
@@ -30,6 +33,7 @@ jobs:
         name: Get repositories information
         run: |
           TIME="$(curl https://api.github.com/repos/${SCRIPT_REPO}/actions/runs/${GITHUB_RUN_ID} | jq -r .created_at)"
+          TAG="ci-$(date -d "${TIME}" -u +'%Y%m%d-%H%M%S-%Z')"
 
           SCRIPT_SHA=$(curl https://api.github.com/repos/${SCRIPT_REPO}/commits/${SCRIPT_REF} | jq -r .sha)
           UBOOT_TAG=$(curl https://api.github.com/repos/${UBOOT_REPO}/releases/${UBOOT_RELEASE} | jq -r .tag_name)
@@ -37,6 +41,7 @@ jobs:
 
           cat <<EOF | sed -E 's/^  //' >>$GITHUB_ENV
             TIME=$TIME
+            TAG=$TAG
             SCRIPT_SHA=$SCRIPT_SHA
             UBOOT_TAG=$UBOOT_TAG
             ARMBIAN_SHA=$ARMBIAN_SHA
@@ -86,6 +91,35 @@ jobs:
               echo "${PATCHES}" | tr ',' '\n' | sed -E 's|(.*)|[armbian/build#\1](http://github.com/armbian/build/pull/\1)|'
             )}
           EOF
+
+      - name: Generate release informations
+        run: |
+          cat <<EOF | sed -E 's/^  //' | tee Release.md
+            CI $(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')
+
+            # Sources
+            Script: [${SCRIPT_REPO}@${SCRIPT_REF}](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_REF}) ([\`${SCRIPT_SHA}\`](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA}))
+            U-Boot: [${UBOOT_REPO}@${UBOOT_RELEASE}](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_RELEASE}) ([\`${UBOOT_TAG}\`](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_TAG}))
+            Armbian: [${ARMBIAN_REPO}@${ARMBIAN_REF}](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_REF}) ([\`${ARMBIAN_SHA}\`](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_SHA}))
+
+            ${PATCHES:+$(
+              echo "# Patches"
+              echo "${PATCHES}" | tr ',' '\n' | sed -E 's|(.*)|[armbian/build#\1](http://github.com/armbian/build/pull/\1)|'
+            )}
+
+            # SHA256
+          EOF
+
+          echo "NAME=$(head --line=1 Release.md)" >>$GITHUB_ENV
+          tail --line=+2 Release.md >Body.md
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ env.NAME }}
+          body_path: Body.md
 
   build-debs:
     name: Build ${{ matrix.BRANCH }}
@@ -140,6 +174,13 @@ jobs:
         with:
           name: debs-${{ matrix.BRANCH }}
           path: output/debs/*
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG }}
+          files: |
+            output/debs/*
 
   build:
     name: Build ${{ matrix.RELEASE }}-${{ matrix.BRANCH }}-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
@@ -271,7 +312,7 @@ jobs:
       - name: Hash and compress images
         run: |
           for f in output/images/*.img; do
-            sha256sum "$f" >"${f}.sha"
+            sha256sum "$f" | tee -a sha256sum
             xz --threads=0 --compress "$f"
           done
 
@@ -281,65 +322,17 @@ jobs:
           name: ${{ matrix.RELEASE }}-${{ matrix.BRANCH }}-${{ matrix.TYPE == 'desktop' && matrix.DESKTOP_ENVIRONMENT || matrix.TYPE }}
           path: output/images/*
 
-  release:
-    needs: [ prepare, build ]
-    runs-on: ubuntu-22.04
-    permissions:
-      contents: write
-
-    steps:
-      - name: Import env
+      - name: Generate release informations
         run: |
-          echo "$(echo "${{ needs.prepare.outputs.env }}" | base64 -d)" >>$GITHUB_ENV
+          cat <<EOF | sed -E 's/^  //' | tee Release.md
+            $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
+          EOF
 
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
+      - name: Upload to release
+        uses: softprops/action-gh-release@v1
         with:
-          path: artifacts/
-
-      - name: Generate sha256sum
-        run: |
-          touch sha256sum
-          for a in artifacts/*/*.sha; do
-            cat "$a" >>sha256sum
-            rm -f "$a"
-          done
-
-      - name: Show sha256sum
-        run: |
-          cat sha256sum
-
-          cat <<EOF | sed -E 's/^  //' >>$GITHUB_STEP_SUMMARY
-            # SHA256
-            $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
-          EOF
-
-      - name: Release
-        run: |
-          cat <<EOF | sed -E 's/^  //' >Release.md
-            CI $(date -d "$TIME" +'%Y-%m-%d %H:%M:%S %Z(%:z)')
-
-            # Sources
-            Script: [${SCRIPT_REPO}@${SCRIPT_REF}](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_REF}) ([\`${SCRIPT_SHA}\`](https://github.com/${SCRIPT_REPO}/tree/${SCRIPT_SHA}))
-            U-Boot: [${UBOOT_REPO}@${UBOOT_RELEASE}](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_RELEASE}) ([\`${UBOOT_TAG}\`](https://github.com/${UBOOT_REPO}/releases/tag/${UBOOT_TAG}))
-            Armbian: [${ARMBIAN_REPO}@${ARMBIAN_REF}](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_REF}) ([\`${ARMBIAN_SHA}\`](https://github.com/${ARMBIAN_REPO}/tree/${ARMBIAN_SHA}))
-
-            ${PATCHES:+$(
-              echo "# Patches"
-              echo "${PATCHES}" | tr ',' '\n' | sed -E 's|(.*)|[armbian/build#\1](http://github.com/armbian/build/pull/\1)|'
-            )}
-
-            # SHA256
-            $(cat sha256sum | awk '{printf "%s: `%s`\n", $2, $1}')
-          EOF
-
-          tag="ci-$(date -d "$TIME" -u +'%Y%m%d-%H%M%S-%Z')"
-          hub release create  -t "$GITHUB_SHA" "$tag" -F Release.md \
-            -a sha256sum \
-            $(for a in artifacts/*/Armbian_*; do echo -a $a; done) \
-            $(for a in artifacts/*/linux-{image,headers,dtb}-*; do echo -a $a; done)
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+          tag_name: ${{ env.TAG }}
+          append_body: true
+          body_path: Release.md
+          files: |
+            output/images/Armbian_*
