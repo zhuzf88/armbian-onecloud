@@ -335,4 +335,4 @@ jobs:
           append_body: true
           body_path: Release.md
           files: |
-            output/images/Armbian_*
+            output/images/*
